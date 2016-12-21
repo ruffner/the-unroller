@@ -1,5 +1,5 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
-<script type="text/javascript" src="../../src/unroller.js"></script>
+<script type="text/javascript" src="../src/unroller.js"></script>
 
 <!--
 `display-element`
@@ -35,15 +35,21 @@
         ctx: {
           type: Object,
         },
+        data: {
+          type: Object,
+        },
         imgData: {
           type: Object,
         }
       },
       ready: function(){
-          this.data = Poly();
-          console.log(data);
-          this.width = 256;
-          this.height = 256;
+          this.map = new FiniteGraph(16);
+          this.map.ident();
+          
+          console.log(this.map);
+          
+          this.width = this.map.width;
+          this.height = this.map.height;
           
           this.ctx = this.$.theCanvas.getContext('2d');
 
@@ -53,22 +59,7 @@
           
       },
       draw: function(){
-        var data = this.imgData.data;
-       
-        for (var i = 0; i <data.length; i += 4) {
-          if( (i/4)%2 == 0 ){
-            data[i] = (Math.floor(Math.sqrt(i/4))%(16))*16;     // red
-            data[i+1] = (Math.floor(Math.sqrt(i/4))%(16))*16; // green
-            data[i+2] = (Math.floor(Math.sqrt(i/4))%(16))*16; // blue
-            data[i+3] = 255;
-          } else {
-            data[i] = 255;     // red
-            data[i+1] = 255; // green
-            data[i+2] = 255; // blue
-            data[i+3] = 255;
-          }
-        }
-        
+        this.map.toCanvasData( this.imgData.data );
         this.ctx.putImageData( this.imgData, 0, 0 );
       }
     });
