@@ -1,0 +1,76 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<script type="text/javascript" src="../../src/unroller.js"></script>
+
+<!--
+`display-element`
+
+
+@demo demo/index.html 
+-->
+
+<dom-module id="display-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    
+    <canvas id="theCanvas" width="[[width]]" height="[[height]]"></canvas>
+    
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'display-element',
+
+      properties: {
+        width: {
+            type: Number,
+        },
+        height: {
+            type: Number,
+        },
+        ctx: {
+          type: Object,
+        },
+        imgData: {
+          type: Object,
+        }
+      },
+      ready: function(){
+          this.data = Poly();
+          console.log(data);
+          this.width = 256;
+          this.height = 256;
+          
+          this.ctx = this.$.theCanvas.getContext('2d');
+
+          this.imgData = this.ctx.getImageData( 0, 0, this.width, this.height);
+          
+          this.draw();
+          
+      },
+      draw: function(){
+        var data = this.imgData.data;
+       
+        for (var i = 0; i <data.length; i += 4) {
+          if( (i/4)%2 == 0 ){
+            data[i] = (Math.floor(Math.sqrt(i/4))%(16))*16;     // red
+            data[i+1] = (Math.floor(Math.sqrt(i/4))%(16))*16; // green
+            data[i+2] = (Math.floor(Math.sqrt(i/4))%(16))*16; // blue
+            data[i+3] = 255;
+          } else {
+            data[i] = 255;     // red
+            data[i+1] = 255; // green
+            data[i+2] = 255; // blue
+            data[i+3] = 255;
+          }
+        }
+        
+        this.ctx.putImageData( this.imgData, 0, 0 );
+      }
+    });
+  </script>
+</dom-module>
