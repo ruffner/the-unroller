@@ -10,11 +10,9 @@
 
 
 var C = {
-    black: [0,0,0,255],
-    white: [255,255,255,255],
-    red: [255,0,0,255],
-    green: [0,255,0,255],
-    blue:[0,0,255,255]
+    colors: {
+        black: '#000',
+    }
 }
 
 
@@ -46,7 +44,7 @@ FiniteGraph.prototype.fill = function(toFill) {
 }
 
 
-// fill the cells with the identity
+// fill the cells with the 'identity' matrix
 FiniteGraph.prototype.ident = function() {
     var pos=0, pc=0;
     
@@ -61,25 +59,5 @@ FiniteGraph.prototype.ident = function() {
             
             pos++;
         }
-    }
-}
-
-
-// convert graph to canvas representation
-// expands each cell to contain rgba data
-FiniteGraph.prototype.toCanvasData = function(imgData) {
-    var pos = 0;
-    
-    for( var i=0; i<this.width; i++ ){
-      for( var j=0; j<this.height; j++ ){
-        if( this.cells[pos].data == 1 ){
-          for( var c=0; c<4; c++ )
-            imgData[pos*4+c] = C.black[c];
-        } else {
-          for( var c=0; c<4; c++ )
-            imgData[pos*4+c] = C.white[c];
-        }
-        pos++;
-      }
     }
 }
