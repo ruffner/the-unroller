@@ -1,6 +1,8 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-slider/paper-slider.html">
-<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -8,41 +10,63 @@
 <script type="text/javascript" src="../src/unroller.js"></script>
 
 <!--
-`display-element`
-
-
+`display-element` a data visualization tool.
 @demo demo/index.html 
 -->
 
 <dom-module id="display-element">
   <template>
-    <style include="iron-flex iron-flex-alignment"></style>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
     <style>
       :host {
         display: block;
       }
-      #scaleSlider {
-        --paper-slider-input: width: 60px;
-        width: 300px;
+      #mainView {
+        padding: 20px;
+      }
+      #canvasDiv {
+        cursor: cell;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
       }
     </style>
-    
-    <div class="layout vertical center">
+    <paper-material id="mainView" elevation="1">
+    <div class="layout vertical">
       
+      <!-- SETTINGS -->
       <div class="layout vertical">
-        <span>Graph Size</span>
-        <paper-slider value="{{graphSize}}" max="32" id="scaleSlider" editable pin></paper-slider>
+        
+        <!-- SAVE AND CLEAR -->
         <div class="layout horizontal center">
-          <paper-icon-button raised id="snapButton" icon="save">SnapShot</paper-icon-button>
-          <div class="layout flex"></div>
-          <paper-icon-button raised id="clearButton" icon="clear">Clear</paper-icon-button>
+          <paper-button raised id="clearButton">Clear</paper-button>
+          <div class="flex"></div>
+          <paper-button raised id="snapButton">SnapShot</paper-button>
+        </div>
+        
+        <!-- SIZE ADJUSTMENT-->
+        <div class="layout horizontal center">
+          <div>Size:</div>
+          <paper-slider class="flex" value="{{graphSize}}" max="32" id="scaleSlider" editable pin></paper-slider>
+        </div>
+        
+        <!-- FILL MODE SELECTION -->
+        <div class="layout horizontal center">
+          <div>Fill mode:</div>
+          <paper-radio-group class="flex" selected="{{fillMode}}">
+            <paper-radio-button name="unset">Unset</paper-radio-button>
+            <paper-radio-button name="toggle">Toggle</paper-radio-button>
+            <paper-radio-button name="set">Set</paper-radio-button>
+          </paper-radio-group>
         </div>
       </div>
       
-      <paper-material id="canvasMaterial" elevation="3" style="width: {{displaySize}}px; height: {{displaySize}}px;" >
+      <!-- DRAWING AREA-->
+      <div class="layout vertical center" id="canvasDiv">
         <canvas id="theCanvas" width="[[displaySize]]" height="[[displaySize]]"></canvas>
-      </paper-material>
+      </div>
     </div>
+    </paper-material>
   </template>
 
   <script>
@@ -57,7 +81,7 @@
         },
         displaySize: {
           type: Number,
-          value: 300,
+          value: 325,
           notify: true,
         },
         scale: {
@@ -73,6 +97,10 @@
           type: Object,
           value: {'x':-1, 'y':-1, 'time': 0},
         },
+        fillMode: {
+          type: String,
+          value: 'toggle',
+        }
       },
       listeners: {
         'scaleSlider.change': '_onScaleChange',
@@ -118,7 +146,6 @@
       toggleCell: function(e){
         // scale down to graphSize
         var pos = this.toGraphCoords(e);
-        
         var offset = pos.x*this.graphSize+pos.y;
         
         // prevent flickering
@@ -128,11 +155,7 @@
           return;
         }
         
-        // toggle cell value
-        if( this.map.cells[offset].data == 1 ) 
-          this.map.cells[offset].data = 0;
-        else 
-          this.map.cells[offset].data = 1;
+        this.map.cells[offset].data = this.fillMode=='set' ? 1 : (this.fillMode=='toggle' ? (this.map.cells[offset].data ? 0 : 1) : 0);
         
         // save state
         this.lastCell = {'x': pos.x, 'y': pos.y, 'time': e.timeStamp};
@@ -140,8 +163,8 @@
       },
       toGraphCoords: function(e){
         var pos = {
-          'x':Math.floor((e.detail.x - this.$.canvasMaterial.offsetLeft)/this.scale),
-          'y':Math.floor((e.detail.y - this.$.canvasMaterial.offsetTop)/this.scale)
+          'x':Math.floor((e.detail.x - this.$.canvasDiv.getBoundingClientRect().left)/this.scale),
+          'y':Math.floor((e.detail.y - this.$.canvasDiv.getBoundingClientRect().top)/this.scale)
         };
         
         // keep in bounds
@@ -160,16 +183,19 @@
         this.draw();
       },
       _onDrawMove: function(e){
+        this.drawing = true;
         if( e.detail.state == 'track' ){
           this.toggleCell(e);
         }
+        return false;
       },
       _onDrawStart: function(e){
-        this.drawing = true;
         this.toggleCell(e);
+        return false;
       },
       _onDrawEnd: function(e){
         this.drawing = false;
+        return false;
       }
     });
   </script>

@@ -2,7 +2,9 @@
   "name": "display-element",
   "main": "display-element.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "paper-radio-group": "^1.2.1",
+    "paper-slider": "^1.0.12"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
