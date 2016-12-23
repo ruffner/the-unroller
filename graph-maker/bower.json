@@ -1,6 +1,6 @@
 {
-  "name": "display-element",
-  "main": "display-element.html",
+  "name": "graph-maker",
+  "main": "graph-maker.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "paper-radio-group": "^1.2.1",
