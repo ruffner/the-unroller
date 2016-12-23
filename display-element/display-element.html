@@ -1,5 +1,6 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -15,6 +16,7 @@
 
 <dom-module id="display-element">
   <template>
+    <style include="iron-flex iron-flex-alignment"></style>
     <style>
       :host {
         display: block;
@@ -25,9 +27,18 @@
       }
     </style>
     
-    <div class="layout center">
-      <span>Graph Size</span>
-      <paper-slider value="{{graphSize}}" max="32" id="scaleSlider" editable pin></paper-slider>
+    <div class="layout vertical center">
+      
+      <div class="layout vertical">
+        <span>Graph Size</span>
+        <paper-slider value="{{graphSize}}" max="32" id="scaleSlider" editable pin></paper-slider>
+        <div class="layout horizontal center">
+          <paper-icon-button raised id="snapButton" icon="save">SnapShot</paper-icon-button>
+          <div class="layout flex"></div>
+          <paper-icon-button raised id="clearButton" icon="clear">Clear</paper-icon-button>
+        </div>
+      </div>
+      
       <paper-material id="canvasMaterial" elevation="3" style="width: {{displaySize}}px; height: {{displaySize}}px;" >
         <canvas id="theCanvas" width="[[displaySize]]" height="[[displaySize]]"></canvas>
       </paper-material>
@@ -57,10 +68,19 @@
         map: {
           type: Object,
         },
+        drawing: false,
+        lastCell: {
+          type: Object,
+          value: {'x':-1, 'y':-1, 'time': 0},
+        },
       },
       listeners: {
         'scaleSlider.change': '_onScaleChange',
-        'theCanvas.tap': '_onCanvasTap',
+        'snapButton.tap': '_onSnapshot',
+        'clearButton.tap': '_onClear',
+        'theCanvas.track': '_onDrawMove',
+        'theCanvas.down': '_onDrawStart',
+        'theCanvas.up': '_onDrawEnd',
       },
       ready: function(){
         this.ctx = this.$.theCanvas.getContext('2d');
@@ -95,18 +115,61 @@
         if(gs <= ds) return (ds/gs);
         else return 1;
       },
-      _onCanvasTap: function(e){
+      toggleCell: function(e){
         // scale down to graphSize
-        var xPos = Math.floor((e.detail.x - this.$.canvasMaterial.offsetLeft)/this.scale);
-        var yPos = Math.floor((e.detail.y - this.$.canvasMaterial.offsetTop)/this.scale);
+        var pos = this.toGraphCoords(e);
+        
+        var offset = pos.x*this.graphSize+pos.y;
+        
+        // prevent flickering
+        if( this.lastCell.x == pos.x && 
+            this.lastCell.y == pos.y &&
+            this.drawing ){
+          return;
+        }
         
         // toggle cell value
-        if( this.map.cells[xPos*this.graphSize+yPos].data == 1 ) 
-          this.map.cells[xPos*this.graphSize+yPos].data = 0;
+        if( this.map.cells[offset].data == 1 ) 
+          this.map.cells[offset].data = 0;
         else 
-          this.map.cells[xPos*this.graphSize+yPos].data = 1;
+          this.map.cells[offset].data = 1;
         
+        // save state
+        this.lastCell = {'x': pos.x, 'y': pos.y, 'time': e.timeStamp};
         this.draw();
+      },
+      toGraphCoords: function(e){
+        var pos = {
+          'x':Math.floor((e.detail.x - this.$.canvasMaterial.offsetLeft)/this.scale),
+          'y':Math.floor((e.detail.y - this.$.canvasMaterial.offsetTop)/this.scale)
+        };
+        
+        // keep in bounds
+        if( pos.x < 0 ) pos.x = 0;
+        if( pos.y < 0 ) pos.y = 0;
+        if( pos.x > this.graphSize-1 ) pos.x = this.graphSize-1;
+        if( pos.y > this.graphSize-1 ) pos.y = this.graphSize-1;
+
+        return pos;
+      },
+      _onSnapshot: function(e){
+        console.log(this.$.theCanvas.toDataURL());
+      },
+      _onClear: function(e){
+        this.map.fill(0);
+        this.draw();
+      },
+      _onDrawMove: function(e){
+        if( e.detail.state == 'track' ){
+          this.toggleCell(e);
+        }
+      },
+      _onDrawStart: function(e){
+        this.drawing = true;
+        this.toggleCell(e);
+      },
+      _onDrawEnd: function(e){
+        this.drawing = false;
       }
     });
   </script>
