@@ -99,7 +99,13 @@
         },
         fillMode: {
           type: String,
+          notify: true,
           value: 'toggle',
+        },
+        savedGraphs: {
+          type: Array,
+          value: [],
+          reflectToAttribute: true,
         }
       },
       listeners: {
@@ -175,8 +181,12 @@
 
         return pos;
       },
+      saveGraph: function(){
+        return {};
+      },
       _onSnapshot: function(e){
-        console.log(this.$.theCanvas.toDataURL());
+        this.push('savedGraphs', {'map': this.map, 'image':this.$.theCanvas.toDataURL()});
+        console.log("snapshots: ", this.savedGraphs);
       },
       _onClear: function(e){
         this.map.fill(0);
