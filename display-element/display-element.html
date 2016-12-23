@@ -1,5 +1,6 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
@@ -18,21 +19,18 @@
       :host {
         display: block;
       }
-      #theCanvas {
-        border: 1px solid #f00;
-      }
       #scaleSlider {
-        --paper-slider-input: width: 80px;
-        width: 100%;
+        --paper-slider-input: width: 60px;
+        width: 300px;
       }
     </style>
     
-    <div class="layout horizontal centered">
-    <div class="layout vertical centered">
+    <div class="layout center">
       <span>Graph Size</span>
-      <paper-slider value="{{graphSize}}" max="16" id="scaleSlider" editable pin></paper-slider>
-      <canvas id="theCanvas" width="[[displaySize]]" height="[[displaySize]]"></canvas>
-    </div>
+      <paper-slider value="{{graphSize}}" max="32" id="scaleSlider" editable pin></paper-slider>
+      <paper-material id="canvasMaterial" elevation="3" style="width: {{displaySize}}px; height: {{displaySize}}px;" >
+        <canvas id="theCanvas" width="[[displaySize]]" height="[[displaySize]]"></canvas>
+      </paper-material>
     </div>
   </template>
 
@@ -48,7 +46,7 @@
         },
         displaySize: {
           type: Number,
-          value: 256,
+          value: 300,
           notify: true,
         },
         scale: {
@@ -56,37 +54,59 @@
           notify: true,
           computed: '_calculateDisplayScale(graphSize, displaySize)',
         },
+        map: {
+          type: Object,
+        },
       },
       listeners: {
         'scaleSlider.change': '_onScaleChange',
+        'theCanvas.tap': '_onCanvasTap',
       },
       ready: function(){
         this.ctx = this.$.theCanvas.getContext('2d');
+        this.resize();
         this.draw();
       },
-      draw: function(){
-        console.log("drawing");
+      resize: function(){
+        if(this.ctx === undefined) return;
+        console.log("resizing");
         
         this.map = new FiniteGraph(this.graphSize);
         this.map.ident();
         
         console.log("new map: ", this.map);
         this.graphSize = this.map.width;
-
+      },
+      draw: function(){
         // clear canvas
         this.ctx.clearRect(0, 0, this.displaySize, this.displaySize);
         
+        // redraw map
         this.ctx.width = this.ctx.width;
         for( var i=0; i<this.map.cells.length; i++ ){
             if(this.map.cells[i].data) this.ctx.fillRect(this.map.cells[i].x * this.scale, this.map.cells[i].y * this.scale, this.scale, this.scale);
         }
       },
       _onScaleChange: function(e){
-        if(this.ctx !== undefined) this.draw();
+         this.resize();
+         this.draw();
       },
       _calculateDisplayScale: function(gs, ds){
         if(gs <= ds) return (ds/gs);
         else return 1;
+      },
+      _onCanvasTap: function(e){
+        // scale down to graphSize
+        var xPos = Math.floor((e.detail.x - this.$.canvasMaterial.offsetLeft)/this.scale);
+        var yPos = Math.floor((e.detail.y - this.$.canvasMaterial.offsetTop)/this.scale);
+        
+        // toggle cell value
+        if( this.map.cells[xPos*this.graphSize+yPos].data == 1 ) 
+          this.map.cells[xPos*this.graphSize+yPos].data = 0;
+        else 
+          this.map.cells[xPos*this.graphSize+yPos].data = 1;
+        
+        this.draw();
       }
     });
   </script>
