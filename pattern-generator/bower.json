@@ -1,6 +1,6 @@
 {
-  "name": "graph-maker",
-  "main": "graph-maker.html",
+  "name": "pattern-generator",
+  "main": "pattern-generator.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "paper-radio-group": "^1.2.1",
