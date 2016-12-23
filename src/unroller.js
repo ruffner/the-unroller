@@ -37,7 +37,7 @@ FiniteGraph.prototype.fill = function(toFill) {
     var pos = 0;
     
     for( var i=0; i<this.width; i++ ){
-        for( var j=0; i<this.height; j++ ){
+        for( var j=0; j<this.height; j++ ){
             this.cells[pos++] = cell(toFill, i, j);
         }
     }
