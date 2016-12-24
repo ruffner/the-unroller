@@ -39,17 +39,21 @@ a way to see saved patterns
       
       <div id="controls" class="layout horizontal center">
         <h3 class="flex">Saved Patterns</h3>
+        <paper-button raised class="tool" id="clearSelection">Clear Selection</paper-button>
         <paper-button raised class="tool" id="removeButton">Remove Selected</paper-button>
       </div>
       
       
-      <iron-selector multi="true" attr-for-selected="id" id="itemSelector" class="layout horizontal wrap">
-        <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
-          <!--<paper-material class="thumb-paper" id="{{index}}" elevation="1">-->
-            <div id="{{index}}"><iron-image sizing="contain" src="{{item.image}}" style="width:100px; height:100px;"></iron-image></div>
-          <!--</paper-material>-->
-        </template>
-      </iron-selector>
+      
+      <div id="selectorContainer" class="layout horizontal wrap">
+        <iron-selector multi="true" attr-for-selected="id" id="itemSelector" selected-values="{{selectedVals}}" class="layout horizontal wrap">
+          <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
+            <!--<paper-material class="thumb-paper" id="{{index}}" elevation="1">-->
+              <div id="{{index}}"><iron-image sizing="contain" src="{{item.image}}" style="width:100px;height:100px;display:block;"></iron-image></div>
+            <!--</paper-material>-->
+          </template>
+        </iron-selector>
+      </div>
     </paper-material>
     
   </template>
@@ -65,10 +69,16 @@ a way to see saved patterns
           notify: true,
           value: [],
         },
+        selectedVals: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
         selecting: false,
       },
       listeners: {
         'removeButton.tap': '_removeSelectedItems',
+        'clearSelection.tap': '_onClearSelection',
         'itemSelector.down': '_onSelectStart',
         'itemSelector.track': '_onSelectTrack',
         'itemSelector.up': '_onSelectEnd',
@@ -79,25 +89,65 @@ a way to see saved patterns
       _removeSelectedItems: function(e){
         console.log("removing selected items");
         
-        var indicies = this.$.itemSelector.selectedValues.sort().reverse();
+        var indicies = this.selectedVals.sort().reverse();
 
         indicies.forEach(function(index) {
           this.splice('savedPatterns', index, 1);
         }.bind(this));
         
-        this.$.itemSelector.selectedValues = [];
+        this.selectedVals = [];
+      },
+      _onClearSelection: function(e){
+        this.set('selectedVals', []);
       },
       _onSelectStart: function(e){
         console.log("selection started");
+        
+        var pos = this._getSelectionPos(e);
+        
+        if( this.initialSelection != pos ) {
+          this.selectedVals = [pos];
+        }
+        this.initialSelection = pos;
+        this.selecting = true;
       },
       _onSelectTrack: function(e){
-        if(e.detail.state == 'track'){
-          console.log("selection tracking");
+        var pos = this._getSelectionPos(e);
+        
+        if( e.detail.state == 'track' && this.initialSelection != pos && this.selecting ){
+          
+          var span = pos - this.initialSelection;
+          var newVals = [this.initialSelection];
+          
+          this.selectedVals = newVals;
+          
+          for( var i=0; i<Math.abs(span); i++ ){
+            this.push('selectedVals', span > 0 ? pos-- : pos++);
+          }
           
         }
       },
       _onSelectEnd: function(e){
         console.log("selection ended");
+        
+        var pos = this._getSelectionPos(e);
+        
+        if( pos==this.initialSelection && this.selectedVals.indexOf(pos)==-1){
+          this.set('selectedVals', [pos]);
+        }
+
+        this.selecting = false;
+      },
+      _getSelectionPos: function(e){
+        var xMax = Math.floor(this.$.itemSelector.offsetWidth / 100) * 100;
+        var yMax = Math.floor(this.$.itemSelector.offsetHeight / 100) * 100;
+        var x = e.detail.x - this.$.itemSelector.getBoundingClientRect().left;
+        var y = e.detail.y - this.$.itemSelector.getBoundingClientRect().top;
+        
+        x = x > xMax ? xMax : (x < 0 ? 0 : x);
+        y = y > yMax ? yMax : (y < 0 ? 0 : y);
+        
+        return Math.floor(y/100) * (xMax/100) + Math.floor(x/100);
       }
     });
   </script>
