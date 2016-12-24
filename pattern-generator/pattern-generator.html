@@ -1,11 +1,11 @@
-<link rel="import" href="bower_components/polymer/polymer.html">
-<link rel="import" href="bower_components/paper-slider/paper-slider.html">
-<link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="bower_components/paper-button/paper-button.html">
-<link rel="import" href="bower_components/paper-material/paper-material.html">
-<link rel="import" href="bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <script type="text/javascript" src="../src/unroller.js"></script>
 
@@ -16,8 +16,7 @@
 
 <dom-module id="pattern-generator">
   <template>
-    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
@@ -62,7 +61,7 @@
       </div>
       
       <!-- DRAWING AREA-->
-      <div class="layout vertical center" id="canvasDiv">
+      <div class="layout vertical center" style="width={{displaySize}}px; margin: 0px auto;" id="canvasDiv">
         <canvas id="theCanvas" width="[[displaySize]]" height="[[displaySize]]"></canvas>
       </div>
     </div>
@@ -102,7 +101,7 @@
           notify: true,
           value: 'toggle',
         },
-        savedGraphs: {
+        savedPatterns: {
           type: Array,
           value: [],
           reflectToAttribute: true,
@@ -185,8 +184,8 @@
         return {};
       },
       _onSnapshot: function(e){
-        this.push('savedGraphs', {'map': this.map, 'image':this.$.theCanvas.toDataURL()});
-        console.log("snapshots: ", this.savedGraphs);
+        this.push('savedPatterns', {'map': this.map, 'image':this.$.theCanvas.toDataURL()});
+        console.log("snapshots: ", this.savedPatterns);
       },
       _onClear: function(e){
         this.map.fill(0);
