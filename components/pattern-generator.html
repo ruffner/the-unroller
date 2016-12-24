@@ -21,7 +21,8 @@
         display: block;
       }
       #mainView {
-        padding: 20px;
+        margin: 10px;
+        padding: 10px;
       }
       #canvasDiv {
         cursor: cell;
@@ -29,8 +30,11 @@
         -webkit-user-select: none;
         -moz-user-select: none;
       }
+      .tool {
+        background: var(--google-green-300);
+      }
     </style>
-    <paper-material id="mainView" elevation="1">
+    <paper-material id="mainView" elevation="2">
     <div class="layout vertical">
       
       <!-- SETTINGS -->
@@ -38,9 +42,9 @@
         
         <!-- SAVE AND CLEAR -->
         <div class="layout horizontal center">
-          <paper-button raised id="clearButton">Clear</paper-button>
+          <paper-button class="tool" raised id="clearButton">Clear</paper-button>
           <div class="flex"></div>
-          <paper-button raised id="snapButton">SnapShot</paper-button>
+          <paper-button class="tool" raised id="snapButton">SnapShot</paper-button>
         </div>
         
         <!-- SIZE ADJUSTMENT-->

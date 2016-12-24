@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="working-tray.html">
 <link rel="import" href="pattern-generator.html">
@@ -16,11 +17,12 @@ create and view patterns
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+        font-family: Roboto;
       }
     </style>
     <div class="layout horizontal">
       <pattern-generator saved-patterns="{{pats}}"></pattern-generator>
-      <working-tray saved-patterns="{{pats}}"></working-tray>
+      <working-tray class="flex" saved-patterns="{{pats}}"></working-tray>
     </div>
   </template>
 

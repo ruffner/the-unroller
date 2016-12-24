@@ -19,25 +19,41 @@ a way to see saved patterns
         display: block;
       }
       .iron-selected {
-        background-color: var(--google-blue-500);
+        background-color: var(--google-blue-300);
         color: white;
       }
       .thumb-paper {
+        margin: 15px;
+        padding: 10px;
+      }
+      #mainView {
         margin: 10px;
+        padding: 10px;
+      }
+      .tool {
+        background: var(--google-green-300);
       }
     </style>
     
-    <iron-selector attr-for-selected="id" class="layout horizontal wrap">
+    
+    <paper-material id="mainView" elevation="2">
       
+      <div id="controls" class="layout horizontal center">
+        <h3 class="flex">Saved Patterns</h3>
+        <paper-button raised class="tool" id="removeButton">Remove Selected</paper-button>
+      </div>
+      
+      
+      <iron-selector multi="true" attr-for-selected="id" id="itemSelector" class="layout horizontal wrap">
+      <!--<div class="layout horizontal wrap">-->
         <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
-          
           <paper-material class="thumb-paper" id="{{index}}" elevation="1">
             <iron-image sizing="contain" src="{{item.image}}" style="width:100px; height:100px;"></iron-image>
           </paper-material>
-          
         </template>
-      
-    </iron-selector>
+      <!--</div>-->
+      </iron-selector>
+    </paper-material>
     
   </template>
 
@@ -51,11 +67,25 @@ a way to see saved patterns
           type: Array,
           notify: true,
         },
-        thumbHeight: 50,
-        thumbWidth: 50,
+      },
+      listeners: {
+        'removeButton.tap': '_removeSelectedItems',
       },
       ready: function(){
         console.log("ready");
+      },
+      _removeSelectedItems: function(e){
+        console.log("removing selected items");
+        
+        //var items = this.$.itemSelector.selectedItems();
+        
+        //console.log(this.$.itemSelector.selectedValues);
+        
+        
+        //this.splice('savedPatterns', this.$.itemSelector.selectedValues, this.$.itemSelector.selectedValues.length)
+      
+        
+        
       }
     });
   </script>
