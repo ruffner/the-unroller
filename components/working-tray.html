@@ -9,7 +9,6 @@
 `working-tray`
 a way to see saved patterns
 
-@demo demo/index.html 
 -->
 
 <dom-module id="working-tray">
@@ -23,8 +22,8 @@ a way to see saved patterns
         color: white;
       }
       .thumb-paper {
-        margin: 15px;
-        padding: 10px;
+        margin: 10px;
+        padding: 0px;
       }
       #mainView {
         margin: 10px;
@@ -45,13 +44,11 @@ a way to see saved patterns
       
       
       <iron-selector multi="true" attr-for-selected="id" id="itemSelector" class="layout horizontal wrap">
-      <!--<div class="layout horizontal wrap">-->
         <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
-          <paper-material class="thumb-paper" id="{{index}}" elevation="1">
-            <iron-image sizing="contain" src="{{item.image}}" style="width:100px; height:100px;"></iron-image>
-          </paper-material>
+          <!--<paper-material class="thumb-paper" id="{{index}}" elevation="1">-->
+            <div id="{{index}}"><iron-image sizing="contain" src="{{item.image}}" style="width:100px; height:100px;"></iron-image></div>
+          <!--</paper-material>-->
         </template>
-      <!--</div>-->
       </iron-selector>
     </paper-material>
     
@@ -66,10 +63,15 @@ a way to see saved patterns
         savedPatterns: {
           type: Array,
           notify: true,
+          value: [],
         },
+        selecting: false,
       },
       listeners: {
         'removeButton.tap': '_removeSelectedItems',
+        'itemSelector.down': '_onSelectStart',
+        'itemSelector.track': '_onSelectTrack',
+        'itemSelector.up': '_onSelectEnd',
       },
       ready: function(){
         console.log("ready");
@@ -77,15 +79,25 @@ a way to see saved patterns
       _removeSelectedItems: function(e){
         console.log("removing selected items");
         
-        //var items = this.$.itemSelector.selectedItems();
+        var indicies = this.$.itemSelector.selectedValues.sort().reverse();
+
+        indicies.forEach(function(index) {
+          this.splice('savedPatterns', index, 1);
+        }.bind(this));
         
-        //console.log(this.$.itemSelector.selectedValues);
-        
-        
-        //this.splice('savedPatterns', this.$.itemSelector.selectedValues, this.$.itemSelector.selectedValues.length)
-      
-        
-        
+        this.$.itemSelector.selectedValues = [];
+      },
+      _onSelectStart: function(e){
+        console.log("selection started");
+      },
+      _onSelectTrack: function(e){
+        if(e.detail.state == 'track'){
+          console.log("selection tracking");
+          
+        }
+      },
+      _onSelectEnd: function(e){
+        console.log("selection ended");
       }
     });
   </script>
