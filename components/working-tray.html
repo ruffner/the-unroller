@@ -1,0 +1,62 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<!--
+`working-tray`
+a way to see saved patterns
+
+@demo demo/index.html 
+-->
+
+<dom-module id="working-tray">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+      .iron-selected {
+        background-color: var(--google-blue-500);
+        color: white;
+      }
+      .thumb-paper {
+        margin: 10px;
+      }
+    </style>
+    
+    <iron-selector attr-for-selected="id" class="layout horizontal wrap">
+      
+        <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
+          
+          <paper-material class="thumb-paper" id="{{index}}" elevation="1">
+            <iron-image sizing="contain" src="{{item.image}}" style="width:100px; height:100px;"></iron-image>
+          </paper-material>
+          
+        </template>
+      
+    </iron-selector>
+    
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'working-tray',
+
+      properties: {
+        savedPatterns: {
+          type: Array,
+          notify: true,
+        },
+        thumbHeight: 50,
+        thumbWidth: 50,
+      },
+      ready: function(){
+        console.log("ready");
+      }
+    });
+  </script>
+</dom-module>

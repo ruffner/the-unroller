@@ -1,10 +1,11 @@
 {
-  "name": "pattern-generator",
-  "main": "pattern-generator.html",
+  "name": "the-unroller",
+  "main": "index.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "paper-radio-group": "^1.2.1",
-    "paper-slider": "^1.0.12"
+    "paper-slider": "^1.0.12",
+    "iron-image": "^1.2.5"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
