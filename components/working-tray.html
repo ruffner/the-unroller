@@ -39,7 +39,7 @@ a way to see saved patterns
       
       <div id="controls" class="layout horizontal center">
         <h3 class="flex">Saved Patterns</h3>
-        <paper-button raised class="tool" id="clearSelection">Clear Selection</paper-button>
+        <paper-button raised class="tool" id="clearButton">Clear Tiles</paper-button>
         <paper-button raised class="tool" id="removeButton">Remove Selected</paper-button>
       </div>
       
@@ -48,9 +48,7 @@ a way to see saved patterns
       <div id="selectorContainer" class="layout horizontal wrap">
         <iron-selector multi="true" attr-for-selected="id" id="itemSelector" selected-values="{{selectedVals}}" class="layout horizontal wrap">
           <template is="dom-repeat" id="patternTemplate" items="{{savedPatterns}}">
-            <!--<paper-material class="thumb-paper" id="{{index}}" elevation="1">-->
               <div id="{{index}}"><iron-image sizing="contain" src="{{item.image}}" style="width:100px;height:100px;display:block;"></iron-image></div>
-            <!--</paper-material>-->
           </template>
         </iron-selector>
       </div>
@@ -78,7 +76,7 @@ a way to see saved patterns
       },
       listeners: {
         'removeButton.tap': '_removeSelectedItems',
-        'clearSelection.tap': '_onClearSelection',
+        'clearButton.tap': '_onClearTiles',
         'itemSelector.down': '_onSelectStart',
         'itemSelector.track': '_onSelectTrack',
         'itemSelector.up': '_onSelectEnd',
@@ -97,7 +95,8 @@ a way to see saved patterns
         
         this.selectedVals = [];
       },
-      _onClearSelection: function(e){
+      _onClearTiles: function(e){
+        this.set('savedPatterns', []);
         this.set('selectedVals', []);
       },
       _onSelectStart: function(e){
